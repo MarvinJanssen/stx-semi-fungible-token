@@ -1,6 +1,11 @@
 [project]
 name = "stx-semi-fungible-token"
 requirements = []
+costs_version = 1
+[contracts.clash-of-clans-alike]
+path = "contracts/clash-of-clans-alike.clar"
+depends_on = ["sipxxx-semi-fungible-token-trait"]
+
 [contracts.semi-fungible-token]
 path = "contracts/semi-fungible-token.clar"
 depends_on = ["sipxxx-semi-fungible-token-trait"]
