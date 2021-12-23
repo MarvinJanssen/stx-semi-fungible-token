@@ -1,4 +1,4 @@
-(impl-trait .sipxxx-semi-fungible-token-trait.sipxxx-semi-fungible-token-trait)
+(impl-trait .sip013-semi-fungible-token-trait.sip013-semi-fungible-token-trait)
 
 (define-fungible-token semi-fungible-token)
 (define-map token-balances {token-id: uint, owner: principal} uint)
@@ -69,7 +69,7 @@
 	(match previous-response prev-ok (transfer (get token-id item) (get amount item) (get sender item) (get recipient item)) prev-err previous-response)
 )
 
-(define-public (transfer-many (transfers (list 200 {token-id: uint, amount: uint, sender: principal, recipient: principal})))
+(define-public (transfer-many (transfers (list 100 {token-id: uint, amount: uint, sender: principal, recipient: principal})))
 	(fold transfer-many-iter transfers (ok true))
 )
 
@@ -77,7 +77,7 @@
 	(match previous-response prev-ok (transfer-memo (get token-id item) (get amount item) (get sender item) (get recipient item) (get memo item)) prev-err previous-response)
 )
 
-(define-public (transfer-many-memo (transfers (list 200 {token-id: uint, amount: uint, sender: principal, recipient: principal, memo: (buff 34)})))
+(define-public (transfer-many-memo (transfers (list 100 {token-id: uint, amount: uint, sender: principal, recipient: principal, memo: (buff 34)})))
 	(fold transfer-many-memo-iter transfers (ok true))
 )
 

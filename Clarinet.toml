@@ -1,16 +1,17 @@
 [project]
 name = "stx-semi-fungible-token"
 requirements = []
+
 [contracts.semi-fungible-token]
 path = "contracts/semi-fungible-token.clar"
-depends_on = ["sipxxx-semi-fungible-token-trait"]
+depends_on = ["sip013-semi-fungible-token-trait"]
 
 [contracts.sip010-ft-trait]
 path = "contracts/test/sip010-ft-trait.clar"
 depends_on = []
 
-[contracts.sipxxx-semi-fungible-token-trait]
-path = "contracts/sipxxx-semi-fungible-token-trait.clar"
+[contracts.sip013-semi-fungible-token-trait]
+path = "contracts/sip013-semi-fungible-token-trait.clar"
 depends_on = []
 
 [contracts.test-sip010]
@@ -19,4 +20,4 @@ depends_on = ["sip010-ft-trait"]
 
 [contracts.wrapped-sip010-sft]
 path = "contracts/wrapped-sip010-sft.clar"
-depends_on = ["sipxxx-semi-fungible-token-trait"]
+depends_on = ["sip013-semi-fungible-token-trait"]

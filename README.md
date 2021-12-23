@@ -1,6 +1,6 @@
 # STX Semi-Fungible Token standard
 
-This is a concept semi-fungible token standard and reference implementation for the Stacks blockchain. It also includes an example Wrapped SIP010 SFT contract that can wrap an arbitrary number of SIP010 tokens across different contracts. For more information on the standard and design of the SFT, check the [draft SIP document](sipxxx-semi-fungible-token-standard.md).
+This is a concept semi-fungible token standard and reference implementation for the Stacks blockchain. It also includes an example Wrapped SIP010 SFT contract that can wrap an arbitrary number of SIP010 tokens across different contracts. For more information on the standard and design of the SFT, check the [draft SIP document](sip013-semi-fungible-token-standard.md).
 
 Semi-fungible tokens can be very useful in many different settings. Here are some examples:
 

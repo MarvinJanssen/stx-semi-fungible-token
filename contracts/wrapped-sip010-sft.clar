@@ -1,13 +1,17 @@
-(impl-trait .sipxxx-semi-fungible-token-trait.sipxxx-semi-fungible-token-trait)
+(impl-trait .sip013-semi-fungible-token-trait.sip013-semi-fungible-token-trait)
+
+(define-constant contract-owner tx-sender)
 
 (define-fungible-token wrapped-sip010-sft)
 (define-map token-balances {token-id: uint, owner: principal} uint)
 (define-map token-supplies uint uint)
 (define-map token-decimals uint uint)
 (define-map asset-contract-ids principal uint)
+(define-map asset-contract-whitelist principal bool)
 (define-data-var asset-contract-id-nonce uint u0)
 
 (define-constant err-owner-only (err u100))
+(define-constant err-not-whitelisted (err u101))
 (define-constant err-insufficient-balance (err u1))
 (define-constant err-invalid-sender (err u4))
 
@@ -102,6 +106,7 @@
 			(
 				(token-id (+ (var-get asset-contract-id-nonce) u1))
 			)
+			(asserts! (is-whitelisted (contract-of sip010-asset)) err-not-whitelisted)
 			(map-set asset-contract-ids (contract-of sip010-asset) token-id)
 			(map-set token-decimals token-id (match (contract-call? sip010-asset get-decimals) decimals decimals err u0))
 			(var-set asset-contract-id-nonce token-id)
@@ -113,7 +118,7 @@
 (define-public (wrap (amount uint) (sip010-asset <sip010-transferable-trait>))
 	(let
 		(
-			(token-id (unwrap-panic (get-or-create-asset-token-id sip010-asset)))
+			(token-id (try! (get-or-create-asset-token-id sip010-asset)))
 		)
 		(try! (contract-call? sip010-asset transfer amount tx-sender (as-contract tx-sender) none))
 		(try! (ft-mint? wrapped-sip010-sft amount tx-sender))
@@ -127,7 +132,7 @@
 (define-public (unwrap (amount uint) (recipient principal) (sip010-asset <sip010-transferable-trait>))
 	(let
 		(
-			(token-id (unwrap-panic (get-or-create-asset-token-id sip010-asset)))
+			(token-id (try! (get-or-create-asset-token-id sip010-asset)))
 			(original-sender tx-sender)
 			(sender-balance (get-balance-uint token-id tx-sender))
 		)
@@ -138,5 +143,16 @@
 		(map-set token-supplies token-id (- (unwrap-panic (get-total-supply token-id)) amount))
 		(print {type: "sft_burn_event", token-id: token-id, amount: amount, sender: original-sender})
 		(ok token-id)
+	)
+)
+
+(define-read-only (is-whitelisted (asset-contract principal))
+	(default-to false (map-get? asset-contract-whitelist asset-contract))
+)
+
+(define-public (set-whitelisted (asset-contract principal) (whitelisted bool))
+	(begin
+		(asserts! (is-eq contract-owner tx-sender) err-owner-only)
+		(ok (map-set asset-contract-whitelist asset-contract whitelisted))
 	)
 )
