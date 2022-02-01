@@ -1,6 +1,15 @@
 [project]
 name = "stx-semi-fungible-token"
 requirements = []
+costs_version = 2
+
+[contracts.fractional-nft]
+path = "contracts/examples/fractional-nft.clar"
+depends_on = ["sip013-semi-fungible-token-trait"]
+
+[contracts.fractional-sip009-sft]
+path = "contracts/examples/fractional-sip009-sft.clar"
+depends_on = ["sip013-semi-fungible-token-trait"]
 
 [contracts.semi-fungible-token]
 path = "contracts/semi-fungible-token.clar"
@@ -19,5 +28,5 @@ path = "contracts/test/test-sip010.clar"
 depends_on = ["sip010-ft-trait"]
 
 [contracts.wrapped-sip010-sft]
-path = "contracts/wrapped-sip010-sft.clar"
+path = "contracts/examples/wrapped-sip010-sft.clar"
 depends_on = ["sip013-semi-fungible-token-trait"]
