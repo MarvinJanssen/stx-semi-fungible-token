@@ -9,6 +9,7 @@
 (define-constant err-owner-only (err u100))
 (define-constant err-unknown-token (err u101))
 (define-constant err-cannot-be-zero (err u102))
+(define-constant err-token-already-exists (err u102))
 (define-constant err-insufficient-balance (err u1))
 (define-constant err-invalid-sender (err u4))
 
@@ -104,6 +105,7 @@
 (define-public (mint (token-id uint) (recipient principal))
 	(begin
 		(asserts! (is-eq tx-sender contract-owner) err-owner-only)
+		(asserts! (is-eq (default-to u0 (map-get? token-supplies token-id)) u0) err-token-already-exists)
 		(try! (ft-mint? fractional-nft u1 recipient))
 		(set-balance token-id (+ (get-balance-uint token-id recipient) u1) recipient)
 		(map-set token-supplies token-id (+ (unwrap-panic (get-total-supply token-id)) u1))
