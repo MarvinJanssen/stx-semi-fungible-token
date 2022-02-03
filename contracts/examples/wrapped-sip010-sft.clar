@@ -3,6 +3,7 @@
 (define-constant contract-owner tx-sender)
 
 (define-fungible-token wrapped-sip010-sft)
+(define-non-fungible-token semi-fungible-token-id {token-id: uint, owner: principal})
 (define-map token-balances {token-id: uint, owner: principal} uint)
 (define-map token-supplies uint uint)
 (define-map token-decimals uint uint)
@@ -59,9 +60,11 @@
 		(
 			(sender-balance (get-balance-uint token-id sender))
 		)
-		(asserts! (is-eq tx-sender sender) err-invalid-sender)
+		(asserts! (or (is-eq sender tx-sender) (is-eq sender contract-caller)) err-invalid-sender)
 		(asserts! (<= amount sender-balance) err-insufficient-balance)
 		(try! (ft-transfer? wrapped-sip010-sft amount sender recipient))
+		(try! (tag-nft-token-id {token-id: token-id, owner: sender}))
+		(try! (tag-nft-token-id {token-id: token-id, owner: recipient}))
 		(set-balance token-id (- sender-balance amount) sender)
 		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
 		(print {type: "sft_transfer_event", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
@@ -122,6 +125,7 @@
 		)
 		(try! (contract-call? sip010-asset transfer amount tx-sender (as-contract tx-sender) none))
 		(try! (ft-mint? wrapped-sip010-sft amount tx-sender))
+		(try! (tag-nft-token-id {token-id: token-id, owner: tx-sender}))
 		(set-balance token-id (+ (get-balance-uint token-id tx-sender) amount) tx-sender)
 		(map-set token-supplies token-id (+ (unwrap-panic (get-total-supply token-id)) amount))
 		(print {type: "sft_mint_event", token-id: token-id, amount: amount, recipient: tx-sender})
@@ -143,6 +147,16 @@
 		(map-set token-supplies token-id (- (unwrap-panic (get-total-supply token-id)) amount))
 		(print {type: "sft_burn_event", token-id: token-id, amount: amount, sender: original-sender})
 		(ok token-id)
+	)
+)
+
+(define-private (tag-nft-token-id (nft-token-id {token-id: uint, owner: principal}))
+	(begin
+		(and
+			(is-some (nft-get-owner? semi-fungible-token-id nft-token-id))
+			(try! (nft-burn? semi-fungible-token-id nft-token-id (get owner nft-token-id)))
+		)
+		(nft-mint? semi-fungible-token-id nft-token-id (get owner nft-token-id))
 	)
 )
 

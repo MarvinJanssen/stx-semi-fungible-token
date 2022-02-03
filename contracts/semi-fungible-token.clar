@@ -48,11 +48,11 @@
 		(
 			(sender-balance (get-balance-uint token-id sender))
 		)
-		(asserts! (is-eq tx-sender sender) err-invalid-sender)
+		(asserts! (or (is-eq sender tx-sender) (is-eq sender contract-caller)) err-invalid-sender)
 		(asserts! (<= amount sender-balance) err-insufficient-balance)
 		(try! (ft-transfer? semi-fungible-token amount sender recipient))
-		(try! (nft-burn? semi-fungible-token-id {token-id: token-id, owner: tx-sender} tx-sender))
-		(try! (nft-mint? semi-fungible-token-id {token-id: token-id, owner: tx-sender} tx-sender))
+		(try! (tag-nft-token-id {token-id: token-id, owner: sender}))
+		(try! (tag-nft-token-id {token-id: token-id, owner: recipient}))
 		(set-balance token-id (- sender-balance amount) sender)
 		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
 		(print {type: "sft_transfer_event", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
@@ -88,13 +88,20 @@
 	(begin
 		(asserts! (is-eq tx-sender contract-owner) err-owner-only)
 		(try! (ft-mint? semi-fungible-token amount recipient))
-		(and
-			(is-none (nft-get-owner? semi-fungible-token-id {token-id: token-id, owner: recipient}))
-			(try! (nft-mint? semi-fungible-token-id {token-id: token-id, owner: recipient} recipient))
-		)
+		(try! (tag-nft-token-id {token-id: token-id, owner: recipient}))
 		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
 		(map-set token-supplies token-id (+ (unwrap-panic (get-total-supply token-id)) amount))
 		(print {type: "sft_mint_event", token-id: token-id, amount: amount, recipient: recipient})
 		(ok true)
+	)
+)
+
+(define-private (tag-nft-token-id (nft-token-id {token-id: uint, owner: principal}))
+	(begin
+		(and
+			(is-some (nft-get-owner? semi-fungible-token-id nft-token-id))
+			(try! (nft-burn? semi-fungible-token-id nft-token-id (get owner nft-token-id)))
+		)
+		(nft-mint? semi-fungible-token-id nft-token-id (get owner nft-token-id))
 	)
 )
