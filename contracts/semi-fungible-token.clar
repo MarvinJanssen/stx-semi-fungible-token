@@ -1,6 +1,7 @@
 (impl-trait .sip013-semi-fungible-token-trait.sip013-semi-fungible-token-trait)
 
 (define-fungible-token semi-fungible-token)
+(define-non-fungible-token semi-fungible-token-id {token-id: uint, owner: principal})
 (define-map token-balances {token-id: uint, owner: principal} uint)
 (define-map token-supplies uint uint)
 
@@ -50,6 +51,8 @@
 		(asserts! (is-eq tx-sender sender) err-invalid-sender)
 		(asserts! (<= amount sender-balance) err-insufficient-balance)
 		(try! (ft-transfer? semi-fungible-token amount sender recipient))
+		(try! (nft-burn? semi-fungible-token-id {token-id: token-id, owner: tx-sender} tx-sender))
+		(try! (nft-mint? semi-fungible-token-id {token-id: token-id, owner: tx-sender} tx-sender))
 		(set-balance token-id (- sender-balance amount) sender)
 		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
 		(print {type: "sft_transfer_event", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
@@ -85,6 +88,10 @@
 	(begin
 		(asserts! (is-eq tx-sender contract-owner) err-owner-only)
 		(try! (ft-mint? semi-fungible-token amount recipient))
+		(and
+			(is-none (nft-get-owner? semi-fungible-token-id {token-id: token-id, owner: recipient}))
+			(try! (nft-mint? semi-fungible-token-id {token-id: token-id, owner: recipient} recipient))
+		)
 		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
 		(map-set token-supplies token-id (+ (unwrap-panic (get-total-supply token-id)) amount))
 		(print {type: "sft_mint_event", token-id: token-id, amount: amount, recipient: recipient})
