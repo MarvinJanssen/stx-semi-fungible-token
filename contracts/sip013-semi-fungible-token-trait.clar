@@ -23,11 +23,5 @@
 
 		;; Transfer from one principal to another with a memo.
 		(transfer-memo (uint uint principal principal (buff 34)) (response bool uint))
-
-		;; Transfer many tokens at once.
-		(transfer-many ((list 100 {token-id: uint, amount: uint, sender: principal, recipient: principal})) (response bool uint))
-
-		;; Transfer many tokens at once with memos.
-		(transfer-many-memo ((list 100 {token-id: uint, amount: uint, sender: principal, recipient: principal, memo: (buff 34)})) (response bool uint))
 	)
 )

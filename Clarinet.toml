@@ -1,19 +1,22 @@
 [project]
 name = "stx-semi-fungible-token"
+authors = []
+description = ""
+telemetry = false
 requirements = []
 costs_version = 2
 
 [contracts.fractional-nft]
 path = "contracts/examples/fractional-nft.clar"
-depends_on = ["sip013-semi-fungible-token-trait"]
+depends_on = ["sip013-semi-fungible-token-trait", "sip013-transfer-many-trait"]
 
 [contracts.fractional-sip009-sft]
 path = "contracts/examples/fractional-sip009-sft.clar"
-depends_on = ["sip013-semi-fungible-token-trait"]
+depends_on = ["sip013-semi-fungible-token-trait", "sip013-transfer-many-trait"]
 
 [contracts.semi-fungible-token]
 path = "contracts/semi-fungible-token.clar"
-depends_on = ["sip013-semi-fungible-token-trait"]
+depends_on = ["sip013-semi-fungible-token-trait", "sip013-transfer-many-trait"]
 
 [contracts.sip010-ft-trait]
 path = "contracts/test/sip010-ft-trait.clar"
@@ -23,10 +26,14 @@ depends_on = []
 path = "contracts/sip013-semi-fungible-token-trait.clar"
 depends_on = []
 
+[contracts.sip013-transfer-many-trait]
+path = "contracts/sip013-transfer-many-trait.clar"
+depends_on = []
+
 [contracts.test-sip010]
 path = "contracts/test/test-sip010.clar"
 depends_on = ["sip010-ft-trait"]
 
 [contracts.wrapped-sip010-sft]
 path = "contracts/examples/wrapped-sip010-sft.clar"
-depends_on = ["sip013-semi-fungible-token-trait"]
+depends_on = ["sip013-semi-fungible-token-trait", "sip013-transfer-many-trait"]
