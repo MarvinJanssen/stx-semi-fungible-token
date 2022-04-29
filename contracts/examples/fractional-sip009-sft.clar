@@ -1,4 +1,5 @@
 (impl-trait .sip013-semi-fungible-token-trait.sip013-semi-fungible-token-trait)
+(impl-trait .sip013-transfer-many-trait.sip013-transfer-many-trait)
 
 (define-constant contract-owner tx-sender)
 
@@ -68,7 +69,7 @@
 		(try! (tag-nft-token-id {token-id: token-id, owner: recipient}))
 		(set-balance token-id (- sender-balance amount) sender)
 		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
-		(print {type: "sft_transfer_event", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
+		(print {type: "sft_transfer", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
 		(ok true)
 	)
 )
@@ -99,7 +100,7 @@
 
 ;; Fractionalising and combining logic
 
-(define-read-only (get-original-nft-id (asset-contract principal) (token-id uint))
+(define-read-only (get-original-nft-id (token-id uint))
 	(map-get? token-id-original-nft-id token-id)
 )
 
@@ -133,7 +134,7 @@
 		(try! (tag-nft-token-id {token-id: token-id, owner: tx-sender}))
 		(set-balance token-id amount tx-sender)
 		(map-set token-supplies token-id amount)
-		(print {type: "sft_mint_event", token-id: token-id, amount: amount, recipient: tx-sender})
+		(print {type: "sft_mint", token-id: token-id, amount: amount, recipient: tx-sender})
 		(ok token-id)
 	)
 )
@@ -150,7 +151,7 @@
 		(try! (as-contract (contract-call? sip009-asset transfer nft-token-id  tx-sender original-sender)))
 		(set-balance token-id u0 original-sender)
 		(map-set token-supplies token-id u0)
-		(print {type: "sft_burn_event", token-id: token-id, amount: token-supply, sender: original-sender})
+		(print {type: "sft_burn", token-id: token-id, amount: token-supply, sender: original-sender})
 		(ok token-id)
 	)
 )

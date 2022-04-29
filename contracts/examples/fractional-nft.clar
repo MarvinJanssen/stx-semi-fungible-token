@@ -1,4 +1,5 @@
 (impl-trait .sip013-semi-fungible-token-trait.sip013-semi-fungible-token-trait)
+(impl-trait .sip013-transfer-many-trait.sip013-transfer-many-trait)
 
 (define-fungible-token fractional-nft)
 (define-non-fungible-token semi-fungible-token-id {token-id: uint, owner: principal})
@@ -58,7 +59,7 @@
 		(try! (tag-nft-token-id {token-id: token-id, owner: recipient}))
 		(set-balance token-id (- sender-balance amount) sender)
 		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
-		(print {type: "sft_transfer_event", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
+		(print {type: "sft_transfer", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
 		(ok true)
 	)
 )
@@ -75,7 +76,7 @@
 	(match previous-response prev-ok (transfer (get token-id item) (get amount item) (get sender item) (get recipient item)) prev-err previous-response)
 )
 
-(define-public (transfer-many (transfers (list 100 {token-id: uint, amount: uint, sender: principal, recipient: principal})))
+(define-public (transfer-many (transfers (list 200 {token-id: uint, amount: uint, sender: principal, recipient: principal})))
 	(fold transfer-many-iter transfers (ok true))
 )
 
@@ -83,7 +84,7 @@
 	(match previous-response prev-ok (transfer-memo (get token-id item) (get amount item) (get sender item) (get recipient item) (get memo item)) prev-err previous-response)
 )
 
-(define-public (transfer-many-memo (transfers (list 100 {token-id: uint, amount: uint, sender: principal, recipient: principal, memo: (buff 34)})))
+(define-public (transfer-many-memo (transfers (list 200 {token-id: uint, amount: uint, sender: principal, recipient: principal, memo: (buff 34)})))
 	(fold transfer-many-memo-iter transfers (ok true))
 )
 
@@ -100,8 +101,8 @@
 		(try! (ft-mint? fractional-nft fractions tx-sender))
 		(try! (tag-nft-token-id {token-id: token-id, owner: tx-sender}))
 		(set-balance token-id fractions tx-sender)
-		(print {type: "sft_burn_event", token-id: token-id, amount: total-supply, sender: tx-sender})
-		(print {type: "sft_mint_event", token-id: token-id, amount: fractions, recipient: tx-sender})
+		(print {type: "sft_burn", token-id: token-id, amount: total-supply, sender: tx-sender})
+		(print {type: "sft_mint", token-id: token-id, amount: fractions, recipient: tx-sender})
 		(ok true)
 	)
 )
@@ -114,7 +115,7 @@
 		(try! (tag-nft-token-id {token-id: token-id, owner: recipient}))
 		(set-balance token-id (+ (get-balance-uint token-id recipient) u1) recipient)
 		(map-set token-supplies token-id (+ (unwrap-panic (get-total-supply token-id)) u1))
-		(print {type: "sft_mint_event", token-id: token-id, amount: u1, recipient: recipient})
+		(print {type: "sft_mint", token-id: token-id, amount: u1, recipient: recipient})
 		(ok true)
 	)
 )

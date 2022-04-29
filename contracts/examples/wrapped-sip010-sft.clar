@@ -1,4 +1,5 @@
 (impl-trait .sip013-semi-fungible-token-trait.sip013-semi-fungible-token-trait)
+(impl-trait .sip013-transfer-many-trait.sip013-transfer-many-trait)
 
 (define-constant contract-owner tx-sender)
 
@@ -67,7 +68,7 @@
 		(try! (tag-nft-token-id {token-id: token-id, owner: recipient}))
 		(set-balance token-id (- sender-balance amount) sender)
 		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
-		(print {type: "sft_transfer_event", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
+		(print {type: "sft_transfer", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
 		(ok true)
 	)
 )
@@ -128,7 +129,7 @@
 		(try! (tag-nft-token-id {token-id: token-id, owner: tx-sender}))
 		(set-balance token-id (+ (get-balance-uint token-id tx-sender) amount) tx-sender)
 		(map-set token-supplies token-id (+ (unwrap-panic (get-total-supply token-id)) amount))
-		(print {type: "sft_mint_event", token-id: token-id, amount: amount, recipient: tx-sender})
+		(print {type: "sft_mint", token-id: token-id, amount: amount, recipient: tx-sender})
 		(ok token-id)
 	)
 )
@@ -145,7 +146,7 @@
 		(try! (as-contract (contract-call? sip010-asset transfer amount tx-sender original-sender none)))
 		(set-balance token-id (- sender-balance amount) original-sender)
 		(map-set token-supplies token-id (- (unwrap-panic (get-total-supply token-id)) amount))
-		(print {type: "sft_burn_event", token-id: token-id, amount: amount, sender: original-sender})
+		(print {type: "sft_burn", token-id: token-id, amount: amount, sender: original-sender})
 		(ok token-id)
 	)
 )
